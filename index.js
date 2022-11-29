@@ -12,11 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_pass}@cluster0.ia0tdiq.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_pass}@cluster0.ia0tdiq.mongodb.net/?retryWrites=true&w=majority`;
 
-console.log(uri);
-
-// const uri = `mongodb+srv://second-hand-products:i6xt64yM4b3IU8V8@cluster0.ia0tdiq.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://second-hand-products:i6xt64yM4b3IU8V8@cluster0.ia0tdiq.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -24,21 +22,21 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-function verifyJWT(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).send("unauthorized access");
-  }
-  const token = authHeader.split(" ")[1];
+// function verifyJWT(req, res, next) {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).send("unauthorized access");
+//   }
+//   const token = authHeader.split(" ")[1];
 
-  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
-    if (err) {
-      return res.status(403).send({ message: "forbidden access" });
-    }
-    req.decoded = decoded;
-    next();
-  });
-}
+//   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+//     if (err) {
+//       return res.status(403).send({ message: "forbidden access" });
+//     }
+//     req.decoded = decoded;
+//     next();
+//   });
+// }
 
 async function dbConnect() {
   try {
@@ -117,7 +115,7 @@ try {
 // second-hand-products-**ok
 // INSERT USER DATA TO MONGODB
 try {
-  app.post("/users",verifyJWT, async (req, res) => {
+  app.post("/users", async (req, res) => {
     const user = req.body;
     const existingUser = await userCollections.findOne({ email: user.email });
     console.log(existingUser);
@@ -174,7 +172,7 @@ try {
 // second-hand-products **ok
 // Insert orders/buyer data
 try {
-  app.post("/orders",verifyJWT, async (req, res) => {
+  app.post("/orders", async (req, res) => {
     const productData = req.body;
     const result = await ordersCollection.insertOne(productData);
     res.send(result);
@@ -186,7 +184,7 @@ try {
 // second-hand-products **ok
 // Insert product data
 try {
-  app.post("/addProduct",verifyJWT, async (req, res) => {
+  app.post("/addProduct", async (req, res) => {
     const productData = req.body;
     const result = await productCollection.insertOne(productData);
 
@@ -199,7 +197,7 @@ try {
 // second-hand-products **ok
 // delete a product
 try {
-  app.delete("/product/:id",verifyJWT, async (req, res) => {
+  app.delete("/product/:id", async (req, res) => {
     const id = req.params.id;
     const filter = { _id: ObjectId(id) };
     const result = await productCollection.deleteOne(filter);
@@ -224,7 +222,7 @@ try {
 // second-hand-products **ok
 // Put user advertise
 try {
-  app.put("/product/advertise/:id",verifyJWT, async (req, res) => {
+  app.put("/product/advertise/:id", async (req, res) => {
     const id = req.params.id;
     const filter = { _id: ObjectId(id) };
     const option = { upsert: true };
@@ -243,7 +241,7 @@ try {
 // second-hand-products **ok
 // Put user verified
 try {
-  app.put("/user/verify/:id",verifyJWT, async (req, res) => {
+  app.put("/user/verify/:id", async (req, res) => {
     const id = req.params.id;
     const filter = { _id: ObjectId(id) };
     const option = { upsert: true };
